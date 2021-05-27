@@ -5,6 +5,9 @@ export default class Game extends Phaser.Scene
     /** @type {Phaser.Physics.Arcade.Sprite} */
     player
 
+    /** @type {Phaser.Input.Keyboard.CursorKeys} */
+    cursors
+
     constructor()
     {
         super('game')
@@ -12,6 +15,7 @@ export default class Game extends Phaser.Scene
 
     preload()
     {
+        // loads the background
         this.load.image('background', 'assets/bg_layer1.png')
 
         // load the platform image
@@ -19,6 +23,8 @@ export default class Game extends Phaser.Scene
 
         // loads the player
         this.load.image('bunny-stand','assets/bunny1_stand.png')
+
+        this.cursors = this.input.keyboard.createCursorKeys()
     }
 
     create()
@@ -58,6 +64,11 @@ export default class Game extends Phaser.Scene
         this.player.body.checkCollision.up = false
 
         this.cameras.main.startFollow(this.player)
+
+        this.cameras.main.startFollow(this.player)
+
+        // set the horizontal deadzone to 1.5 times the game width
+        this.cameras.main.setDeadzone(this.scale.width *  1.5)
     }
 
     update()
@@ -83,6 +94,39 @@ export default class Game extends Phaser.Scene
         {
             // this makes the bunny jump straight up
             this.player.setVelocityY(-300)
+        }
+
+        // movement logic
+        if (this.cursors.left.isDown && !touchingDown)
+        {
+            this.player.setVelocityX(-200)
+        }
+        else if (this.cursors.right.isDown && ! touchingDown)
+        {
+            this.player.setVelocityX(200)
+        }
+        else 
+        {
+            this.player.setVelocityX(0)
+        }
+
+        this.horizontalWrap(this.player)
+    }
+
+    /**
+     * @param {Phaser.GameObjects.Sprite} sprite
+     */
+    horizontalWrap(sprite)
+    {
+        const halfWidth = sprite.displayWidth * 0.5
+        const gameWidth = this.scale.width
+        if (sprite.x < -halfWidth)
+        {
+            sprite.x = gameWidth + halfWidth
+        }
+        else if (sprite.x > gameWidth + halfWidth)
+        {
+            sprite.x = -halfWidth
         }
     }
 }
