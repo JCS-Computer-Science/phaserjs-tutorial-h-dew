@@ -1,6 +1,6 @@
 import Phaser from '../lib/phaser.js'
 
-export default class Carrot extends Phaser.GameObjects.Sprite
+export default class Carrot extends Phaser.Physics.Arcade.Sprite
 {
     /**
      * @param {Phaser.Scene} Scene
@@ -8,9 +8,10 @@ export default class Carrot extends Phaser.GameObjects.Sprite
      * @param {number} y
      * @param {string} texture
      */
+
     constructor(scene, x, y, texture)
     {
-        super(scene, x, y. texture)
+        super(scene, x, y, texture)
 
         this.setScale(0.5)
     }
