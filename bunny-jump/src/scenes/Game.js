@@ -23,11 +23,14 @@ export default class Game extends Phaser.Scene
 
     create()
     {
+        this.add.image(240, 320, 'background')
+            .setScrollFactor(1, 0)
+
         // add background
         this.add.image(240, 320,'background')
 
         // create the group
-        const platforms = this.physics.add.staticGroup()
+        this.platforms = this.physics.add.staticGroup()
 
         // then create 5 platforms from the group
         for (let i=0; i < 5; ++i)
@@ -36,7 +39,7 @@ export default class Game extends Phaser.Scene
             const y = 150 * i
 
             /** @type {Phaser.Physics.Arcade.Sprite} */
-            const platform = platforms.create(x, y, 'platform')
+            const platform = this.platforms.create(x, y, 'platform')
             platform.scale = 0.5
 
             /** @type {Phaser.Physics.Arcade.StaticBody} */
@@ -48,7 +51,7 @@ export default class Game extends Phaser.Scene
         this.player = this.physics.add.sprite(240, 320, 'bunny-stand')
             .setScale(0.5)
 
-        this.physics.add.collider(platforms, this.player)
+        this.physics.add.collider(this.platforms, this.player)
 
         this.player.body.checkCollision.left = false
         this.player.body.checkCollision.right = false
@@ -59,6 +62,20 @@ export default class Game extends Phaser.Scene
 
     update()
     {
+        //scrolls platforms
+        this.platforms.children.iterate(child => {
+            /** @type {Phaser.Physics.Arcade.Sprite} */
+            const platform = child
+
+            const scrollY = this.cameras.main.scrollY
+            if (platform.y >= scrollY + 700)
+            {
+                platform.y = scrollY - Phaser.Math.Between(50, 100)
+                platform.body.updateFromGameObject()
+            }
+        })
+
+
         // use Arcade Physics to find if player is touching something below it
         const touchingDown = this.player.body.touching.down
 
