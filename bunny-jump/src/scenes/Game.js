@@ -5,6 +5,8 @@ import Carrot from '../game/Carrot.js'
 
 export default class Game extends Phaser.Scene
 {
+    carrotsColledted = 0
+
     /** @type {Phaser.Physics.Arcade.Sprite} */
     player
 
@@ -81,6 +83,15 @@ export default class Game extends Phaser.Scene
         })
 
         this.physics.add.collider(this.platforms, this.carrots)
+
+        
+        this.physics.add.overlap(
+            this.player,
+            this.carrots,
+            this.handleCollectCarrot,
+            undefined,
+            this
+        )
     }
 
     update()
@@ -111,7 +122,11 @@ export default class Game extends Phaser.Scene
         }
 
         // movement logic
-        if (this.cursors.left.isDown && !touchingDown)
+        if (this.cursors.left.isDown && this.cursors.right.isDown && !touchingDown)
+        {
+            this.player.setVelocityX(0)
+        }
+        else if (this.cursors.left.isDown && !touchingDown)
         {
             this.player.setVelocityX(-200)
         }
@@ -156,11 +171,44 @@ export default class Game extends Phaser.Scene
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const carrot = this.carrots.get(sprite.x, y, 'carrot')
 
+        // set active and visible
+        carrot.setActive(true)
+        carrot.setVisible(true)
+
         this.add.existing(carrot)
 
         carrot.body.setSize(carrot.width, carrot.height)
 
+        this.physics.world.enable(carrot)
+
         return carrot
+    }
+
+    /**
+     * @param {Phaser.Physics.Arcade.Sprite} player
+     * @param {Carrot} carrot
+     */
+    handleCollectCarrot(player, carrot)
+    {
+        // hide from display
+        this.carrots.killAndHide(carrot)
+
+        // disable from physics world
+        this.physics.world.disableBody(carrot.body)
+    }
+
+    /**
+     * @param {Phaser.Physics.Arcade.Sprite} player
+     * @param {Carrot} carrot
+     */
+    handleCollectCarrot(player, carrot)
+    {
+        this.carrots.killAndHide(carrot)
+
+        this.physics.world.disableBody(carrot.body)
+
+        // increment by 1
+        this.carrotsCollected++
     }
 }
 
