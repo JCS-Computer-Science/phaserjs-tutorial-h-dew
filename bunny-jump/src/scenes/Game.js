@@ -13,6 +13,9 @@ export default class Game extends Phaser.Scene
     /** @type {Phaser.Input.Keyboard.CursorKeys} */
     cursors
 
+    /** @type {Phaser.GameObjects.Text} */
+    carrotsCollectedText
+
     constructor()
     {
         super('game')
@@ -92,6 +95,11 @@ export default class Game extends Phaser.Scene
             undefined,
             this
         )
+
+        const style = { color: '#000', fontSize: 24 }
+        this.carrotsCollectedText = this.add.text(240, 10, 'Carrots: 0', style)
+            .setScrollFactor(0)
+            .setOrigin(0.5, 0)
     }
 
     update()
@@ -209,6 +217,10 @@ export default class Game extends Phaser.Scene
 
         // increment by 1
         this.carrotsCollected++
+
+        // create new text value and set it
+        const value = `Carrots: ${this.carrotsCollected}`
+        this.carrotsCollectedText.text = value
     }
 }
 
