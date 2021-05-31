@@ -5,7 +5,7 @@ import Carrot from '../game/Carrot.js'
 
 export default class Game extends Phaser.Scene
 {
-    carrotsColledted = 0
+    carrotsCollected = 0
 
     /** @type {Phaser.Physics.Arcade.Sprite} */
     player
@@ -21,6 +21,11 @@ export default class Game extends Phaser.Scene
         super('game')
     }
 
+    init()
+    {
+        this.carrotsCollected = 0
+    }
+
     preload()
     {
         // loads the background
@@ -33,6 +38,12 @@ export default class Game extends Phaser.Scene
         this.load.image('bunny-stand','assets/bunny1_stand.png')
 
         this.load.image('carrot', 'assets/carrot.png')
+
+        this.load.image('bunny-jump', 'assets/bunny1_jump.png')
+
+        this.load.audio('carrot-sound', 'assets/sfx/carrotCollect.wav')
+
+        this.load.audio('jump', 'assets/sfx/phaseJump1.mp3')
 
         this.cursors = this.input.keyboard.createCursorKeys()
     }
@@ -127,6 +138,19 @@ export default class Game extends Phaser.Scene
         {
             // this makes the bunny jump straight up
             this.player.setVelocityY(-300)
+
+            // switch to jump texture
+            this.player.setTexture('bunny-jump')
+
+            //play jump sound 
+            this.sound.play('jump')
+        }
+
+        const vy = this.player.body.velocity.y
+        if (vy > 0 && this.player.texture.key !== 'bunny-stand')
+        {
+            // switch back to stand texture when falling
+            this.player.setTexture('bunny-stand')
         }
 
         // movement logic
@@ -148,6 +172,12 @@ export default class Game extends Phaser.Scene
         }
 
         this.horizontalWrap(this.player)
+
+        const bottomPlatform = this.findBottomMostPlatform()
+        if (this.player.y > bottomPlatform.y + 200)
+        {
+            this.scene.start('game-over')
+        }
     }
 
     /**
@@ -198,19 +228,6 @@ export default class Game extends Phaser.Scene
      */
     handleCollectCarrot(player, carrot)
     {
-        // hide from display
-        this.carrots.killAndHide(carrot)
-
-        // disable from physics world
-        this.physics.world.disableBody(carrot.body)
-    }
-
-    /**
-     * @param {Phaser.Physics.Arcade.Sprite} player
-     * @param {Carrot} carrot
-     */
-    handleCollectCarrot(player, carrot)
-    {
         this.carrots.killAndHide(carrot)
 
         this.physics.world.disableBody(carrot.body)
@@ -221,6 +238,30 @@ export default class Game extends Phaser.Scene
         // create new text value and set it
         const value = `Carrots: ${this.carrotsCollected}`
         this.carrotsCollectedText.text = value
+
+        // play collect sound
+        this.sound.play('carrot-sound')
+    }
+
+    findBottomMostPlatform()
+    {
+        const platforms = this.platforms.getChildren()
+        let bottomPlatform = platforms[0]
+
+        for (let i = 1; i < platforms.length; ++i)
+        {
+            const platform = platforms[i]
+
+            // discard any platforms that are above curremt
+            if (platform.y < bottomPlatform.y)
+            {
+                continue
+            }
+
+            bottomPlatform = platform
+        }
+
+        return bottomPlatform
     }
 }
 
