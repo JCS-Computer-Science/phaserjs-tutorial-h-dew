@@ -1,6 +1,6 @@
 import Phaser from '../lib/phaser.js'
 
-// import the carrot class
+//import the carrot class
 import Carrot from '../game/Carrot.js'
 
 export default class Game extends Phaser.Scene
@@ -28,13 +28,13 @@ export default class Game extends Phaser.Scene
 
     preload()
     {
-        // loads the background
+        //loads the background
         this.load.image('background', 'assets/bg_layer1.png')
 
-        // load the platform image
+        //load the platform image
         this.load.image('platform', 'assets/ground_grass.png')
 
-        // loads the player
+        //loads the player
         this.load.image('bunny-stand','assets/bunny1_stand.png')
 
         this.load.image('carrot', 'assets/carrot.png')
@@ -53,13 +53,13 @@ export default class Game extends Phaser.Scene
         this.add.image(240, 320, 'background')
             .setScrollFactor(1, 0)
 
-        // add background
+        //add background
         this.add.image(240, 320,'background')
 
-        // create the group
+        //create the group
         this.platforms = this.physics.add.staticGroup()
 
-        // then create 5 platforms from the group
+        //then create 5 platforms from the group
         for (let i=0; i < 5; ++i)
         {
             const x = Phaser.Math.Between(80, 400)
@@ -74,7 +74,7 @@ export default class Game extends Phaser.Scene
             body.updateFromGameObject()
         }
 
-        // creates the player sprite
+        //creates the player sprite
         this.player = this.physics.add.sprite(240, 320, 'bunny-stand')
             .setScale(0.5)
 
@@ -88,10 +88,10 @@ export default class Game extends Phaser.Scene
 
         this.cameras.main.startFollow(this.player)
 
-        // set the horizontal deadzone to 1.5 times the game width
+        //set the horizontal deadzone to 1.5 times the game width
         this.cameras.main.setDeadzone(this.scale.width *  1.5)
 
-        // create a carrot 
+        //create a carrot 
         this.carrots = this.physics.add.group({
             classType: Carrot
         })
@@ -131,15 +131,15 @@ export default class Game extends Phaser.Scene
         })
 
 
-        // use Arcade Physics to find if player is touching something below it
+        //use Arcade Physics to find if player is touching something below it
         const touchingDown = this.player.body.touching.down
 
         if (touchingDown)
         {
-            // this makes the bunny jump straight up
+            //this makes the bunny jump straight up
             this.player.setVelocityY(-300)
 
-            // switch to jump texture
+            //switch to jump texture
             this.player.setTexture('bunny-jump')
 
             //play jump sound 
@@ -149,11 +149,11 @@ export default class Game extends Phaser.Scene
         const vy = this.player.body.velocity.y
         if (vy > 0 && this.player.texture.key !== 'bunny-stand')
         {
-            // switch back to stand texture when falling
+            //switch back to stand texture when falling
             this.player.setTexture('bunny-stand')
         }
 
-        // movement logic
+        //movement logic
         if (this.cursors.left.isDown && this.cursors.right.isDown && !touchingDown)
         {
             this.player.setVelocityX(0)
@@ -209,7 +209,7 @@ export default class Game extends Phaser.Scene
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const carrot = this.carrots.get(sprite.x, y, 'carrot')
 
-        // set active and visible
+        //set active and visible
         carrot.setActive(true)
         carrot.setVisible(true)
 
@@ -232,14 +232,14 @@ export default class Game extends Phaser.Scene
 
         this.physics.world.disableBody(carrot.body)
 
-        // increment by 1
+        //increment by 1
         this.carrotsCollected++
 
-        // create new text value and set it
+        //create new text value and set it
         const value = `Carrots: ${this.carrotsCollected}`
         this.carrotsCollectedText.text = value
 
-        // play collect sound
+        //play collect sound
         this.sound.play('carrot-sound')
     }
 
@@ -252,7 +252,7 @@ export default class Game extends Phaser.Scene
         {
             const platform = platforms[i]
 
-            // discard any platforms that are above curremt
+            //discard any platforms that are above curremt
             if (platform.y < bottomPlatform.y)
             {
                 continue
